@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000'; // change to `/api` later when proxied via Docker
+//const API_URL = 'http://localhost:5000'; // change to `/api` later when proxied via Docker
+const API_URL = 'http://3.83.202.13:5000';
 
 function App() {
   const [form, setForm] = useState({ name: '', series_name: '', rating: 0 });
