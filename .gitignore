@@ -1,0 +1,43 @@
+# Global Python ignores
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+*.sqlite3
+
+# Flask specific
+instance/
+*.db
+*.swp
+*.swo
+
+# Editor swap/backup files
+*.swp
+*.swo
+*~
+
+# VSCode and JetBrains IDEs
+.vscode/
+.idea/
+
+# Environment variables
+.env
+
+# Node.js (React frontend)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*.local
+
+# Log files
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
