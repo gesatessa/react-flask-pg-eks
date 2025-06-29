@@ -28,7 +28,7 @@ jobs:
           pip install flake8 -r backend/requirements.txt
 
       - name: Run flake8
-        run: flake8 backend/app/
+        run: flake8 --config=backend/app/.flake8 backend/app/
 
   test:
     name: Test Backend
