@@ -21,7 +21,7 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: 18.215.37.214.nip.io
+    - host: 44.219.41.13.nip.io
       http:
         paths:
           - path: /

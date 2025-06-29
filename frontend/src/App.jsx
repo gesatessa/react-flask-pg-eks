@@ -48,7 +48,7 @@ function App() {
       <input name="rating" type="number" min="0" max="5" value={form.rating} onChange={handleChange} />
       <button onClick={submitRating}>Submit</button>
 
-      <h2>Last 5 Ratings</h2>
+      <h2>Last 5 Ratings:</h2>
       <ul>
         {recent.map((r, idx) => (
           <li key={idx}>{r.name} rated {r.series_name} → {r.rating}/5</li>
