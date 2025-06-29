@@ -47,13 +47,14 @@ jobs:
       - name: Run tests
         run: echo "Add tests here"  # replace with pytest if needed
 
-  build-backend:
-    name: Build and Push Backend Image
-    needs: test
+  login-ecr:
+    name: Login to ECR
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
+    outputs:
+      login: ${{ steps.login-ecr.outcome }}
     steps:
       - uses: actions/checkout@v4
 
@@ -63,8 +64,16 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
+      - name: Login to ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
+  build-backend:
+    name: Build and Push Backend Image
+    needs: [test, login-ecr]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Build and Push Backend
         run: |
@@ -74,21 +83,10 @@ jobs:
 
   build-frontend:
     name: Build and Push Frontend Image
+    needs: login-ecr
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Push Frontend
         run: |
