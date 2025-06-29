@@ -4,6 +4,7 @@ from . import db
 
 bp = Blueprint('api', __name__)
 
+
 @bp.route('/rate', methods=['POST'])
 def rate():
     data = request.json
@@ -16,6 +17,7 @@ def rate():
     db.session.commit()
     return jsonify({'message': 'Rating added'}), 201
 
+
 @bp.route('/recent', methods=['GET'])
 def recent():
     last_five = Rating.query.order_by(Rating.id.desc()).limit(5).all()
@@ -23,6 +25,7 @@ def recent():
         {'name': r.name, 'series_name': r.series_name, 'rating': r.rating}
         for r in last_five
     ])
+
 
 @bp.route('/stats/<series_name>', methods=['GET'])
 def stats(series_name):

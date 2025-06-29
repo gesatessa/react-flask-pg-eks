@@ -49,7 +49,7 @@ jobs:
 
   build-backend:
     name: Build and Push Backend Image
-    needs: test
+    needs: [test, lint]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
