@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-//const API_URL = 'http://localhost:5000'; // change to `/api` later when proxied via Docker
-const API_URL = 'http://3.83.202.13:5000';
+
+//const API_URL = 'http://3.83.202.13:5000';
+//const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+//const API_URL = import.meta.env.VITE_API_URL; // docker-compose
+const API_URL = '/api' // ingress
 
 function App() {
   const [form, setForm] = useState({ name: '', series_name: '', rating: 0 });

@@ -1,0 +1,29 @@
+# frontend/Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy app source
+COPY . .
+
+# Accept build-time API URL
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+# Build the production frontend
+RUN npm run build
+
+# Install a minimal static server
+RUN npm install -g serve
+
+# Expose port and serve build
+EXPOSE 5173
+#CMD ["npm", "run", "dev", "--", "--host"]
+
+# replace `npm run dev` with `serve -s dist`,
+##meaning your app is built once and served — faster and easier for deployment.
+CMD ["serve", "-s", "dist", "-l", "5173"]

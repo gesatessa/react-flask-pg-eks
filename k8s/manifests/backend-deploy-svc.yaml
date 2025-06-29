@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: 018733487945.dkr.ecr.us-east-1.amazonaws.com/backend:v1
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: DATABASE_URL
+            - name: FLASK_DEBUG
+              value: "1"
+          command: ["/wait-for-it.sh", "postgres:5432", "--", "flask", "run", "--host=0.0.0.0"]
+          volumeMounts:
+            - name: wait-script
+              mountPath: /wait-for-it.sh
+              subPath: wait-for-it.sh
+      volumes:
+        - name: wait-script
+          configMap:
+            name: backend-wait-script
+            defaultMode: 0775
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
+

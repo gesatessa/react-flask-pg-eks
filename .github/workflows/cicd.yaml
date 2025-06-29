@@ -1,0 +1,123 @@
+name: Build and Deploy Full Stack App to EKS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  BACKEND_REPO: backend-ecr
+  FRONTEND_REPO: frontend-ecr
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  lint:
+    name: Lint Backend Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install flake8 and requirements
+        run: |
+          pip install flake8 -r backend/requirements.txt
+
+      - name: Run flake8
+        run: flake8 backend/app/
+
+  test:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run tests
+        run: echo "Add tests here"  # replace with pytest if needed
+
+  login-ecr:
+    name: Login to ECR
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      login: ${{ steps.login-ecr.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+  build-backend:
+    name: Build and Push Backend Image
+    needs: [lint, test, login-ecr]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and Push Backend
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.BACKEND_REPO }}:${{ env.IMAGE_TAG }}
+          docker build -t $IMAGE_URI -f backend/Dockerfile backend
+          docker push $IMAGE_URI
+
+  build-frontend:
+    name: Build and Push Frontend Image
+    needs: login-ecr
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and Push Frontend
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.FRONTEND_REPO }}:${{ env.IMAGE_TAG }}
+          docker build -t $IMAGE_URI -f frontend/Dockerfile frontend
+          docker push $IMAGE_URI
+
+  update-manifests:
+    name: Update K8s Manifests
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update backend image
+        run: |
+          BACKEND_IMAGE=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.BACKEND_REPO }}:${{ env.IMAGE_TAG }}
+          sed -i "s|image: .*backend.*|image: $BACKEND_IMAGE|" k8s/manifests/backend-deploy-svc.yaml
+
+      - name: Update frontend image
+        run: |
+          FRONTEND_IMAGE=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.FRONTEND_REPO }}:${{ env.IMAGE_TAG }}
+          sed -i "s|image: .*frontend.*|image: $FRONTEND_IMAGE|" k8s/manifests/frontend-deploy-svc.yaml
+
+      - name: Commit and push updated manifests
+        run: |
+          git config user.name "gh-actions"
+          git config user.email "gh-actions@github.com"
+          git add k8s/manifests/*.yaml
+          git commit -m "Update backend & frontend image to ${{ env.IMAGE_TAG }}"
+          git push

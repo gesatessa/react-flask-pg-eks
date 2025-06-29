@@ -10,8 +10,8 @@ docker exec -it react-flask-pg-eks-backend-1 sh
 
 # wait-for-it.sh
 ```sh
-had to run `chmod +x backend/wait-for-it.sh` on local machine
-and then build container.
+# run `chmod +x backend/wait-for-it.sh` on local machine
+# and then build container.
 
 ```
 

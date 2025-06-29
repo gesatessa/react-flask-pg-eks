@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-wait-script
+data:
+  wait-for-it.sh: |
+    #!/usr/bin/env bash
+    # --- your wait-for-it.sh content here ---
+    # use the full script content from your repo
