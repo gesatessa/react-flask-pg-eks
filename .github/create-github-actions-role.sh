@@ -61,7 +61,7 @@ aws iam put-role-policy \
       {
         "Effect": "Allow",
         "Action": [
-          "ecr:GetAu1thorizationToken",
+          "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:CompleteLayerUpload",
           "ecr:UploadLayerPart",

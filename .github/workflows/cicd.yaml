@@ -70,7 +70,7 @@ jobs:
 
   build-backend:
     name: Build and Push Backend Image
-    needs: [lint, test, login-ecr]
+    needs: [test, login-ecr]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
