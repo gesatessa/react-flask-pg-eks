@@ -20,7 +20,7 @@ def rate():
 
 @bp.route('/recent', methods=['GET'])
 def recent():
-    last_five = Rating.query.order_by(Rating.id.desc()).limit(5).all()
+    last_five = Rating.query.order_by(Rating.id.desc()).limit(3).all()
     return jsonify([
         {'name': r.name, 'series_name': r.series_name, 'rating': r.rating}
         for r in last_five
