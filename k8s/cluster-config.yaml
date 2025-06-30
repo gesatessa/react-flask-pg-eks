@@ -2,11 +2,11 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: movies-cluster
+  name: movies
   region: us-east-1
 
 managedNodeGroups:
-  - name: flask-app-node
+  - name: react-flask-pg-node
     instanceType: t3.small
     desiredCapacity: 3
     minSize: 1

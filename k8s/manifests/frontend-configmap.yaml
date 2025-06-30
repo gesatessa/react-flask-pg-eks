@@ -4,4 +4,4 @@ metadata:
   name: frontend-config
 data:
   #VITE_API_URL: http://backend:5000
-  VITE_API_URL: http://44.219.41.13.nip.io/api
+  VITE_API_URL: http://3.216.103.74.nip.io/api
